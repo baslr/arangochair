@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "request-easy": "^2.0.1"
+  },
+  "name": "arangochair",
+  "version": "1.0.0",
+  "description": "3rd library; get notified when ArangoDBs documents change'",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/baslr/arangochair.git"
+  },
+  "keywords": [
+    "arangodb",
+    "push"
+  ],
+  "author": "Manuel Baesler",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/baslr/arangochair/issues"
+  },
+  "homepage": "https://github.com/baslr/arangochair#readme"
+}
