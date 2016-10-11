@@ -3,7 +3,7 @@
     "request-easy": "^2.0.1"
   },
   "name": "arangochair",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "3rd library; get notified when ArangoDBs documents change'",
   "main": "index.js",
   "devDependencies": {},
