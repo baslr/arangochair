@@ -17,7 +17,9 @@
   "keywords": [
     "arangodb",
     "push",
-    "realtime"
+    "realtime",
+    "watch",
+    "monitor"
   ],
   "author": "Manuel Baesler",
   "license": "AGPL-3.0",

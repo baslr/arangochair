@@ -1,6 +1,11 @@
 # arangochair
-3rd library; get notified when collections change
+get notified in realtime when ArangoDBs collections / documents change.
 
+## install
+
+```bash
+npm install --save arangochair
+```
 
 ## quick example
 
@@ -14,13 +19,39 @@ no4.start();
 no4.on('users', (doc, type) => {
     // do something awesome
 });
+
+no4.on('error', (err, httpStatus, headers, body) => {
+    // arangochair stops on errors
+    // check last http request
+    no4.start();
+});
 ```
 
-## subscribe options
+## subscribe
 
+```es6
+// subscribe to all events in the users collection
+no4.subscribe('users');
+
+// explicit
+no4.subscribe({collection:'users', events:['insert/update', 'delete']});
+
+
+// subscribe the users collection with only the delete event
+no4.subscribe({collection:'users', events:['delete']});
+
+// subscribe the users collection with only the delete event on key myKey
+no4.subscribe({collection:'users', events:['delete'], keys:['myKey']});
 ```
-{
-    collection:'collectionToWatch',
-    events:['insert/update', 'delete']
-}
+
+## unsubscribe
+```es6
+// unsubscribe the users collection
+no4.unsubscribe('users');
+
+// unsubscribe the delete event in the users collection
+no4.unsubscribe({collection:'users',events:['delete']});
+
+// unsubscribe the key myKey in the users collection
+no4.unsubscribe({collection:'users',keys:['myKey']});
 ```
