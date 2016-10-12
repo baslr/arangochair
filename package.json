@@ -4,7 +4,7 @@
   },
   "name": "arangochair",
   "version": "4.0.0",
-  "description": "3rd party library; get notified when ArangoDBs documents change'",
+  "description": "`arangochair` pushs ArangoDB changes in realtime to you",
   "main": "index.js",
   "devDependencies": {},
   "scripts": {
