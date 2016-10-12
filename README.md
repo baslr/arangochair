@@ -1,5 +1,6 @@
 # arangochair
-get notified in realtime when ArangoDBs collections / documents change.
+
+`arangochair` pushs ArangoDB changes in realtime to you.
 
 ## install
 
@@ -12,12 +13,17 @@ npm install --save arangochair
 ```es6
 const arangochair = require('arangochair');
 
-no4 = new arangochair('http://127.0.0.1:8529');
+const no4 = new arangochair('http://127.0.0.1:8529/'); // ArangoDB node to monitor
+
+const no4 = new arangochair('http://127.0.0.1:8529/myDb'); // ArangoDB node to monitor, with database name
 
 no4.subscribe({collection:'users'});
 no4.start();
 no4.on('users', (doc, type) => {
     // do something awesome
+
+    // doc:Buffer
+    // type:'insert/update'|'delete'
 });
 
 no4.on('error', (err, httpStatus, headers, body) => {
