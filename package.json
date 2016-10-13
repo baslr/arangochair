@@ -3,7 +3,7 @@
     "request-easy": "^2.0.1"
   },
   "name": "arangochair",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "`arangochair` pushs ArangoDB changes in realtime to you",
   "main": "index.js",
   "devDependencies": {},
