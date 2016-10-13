@@ -140,6 +140,7 @@ class ArangoChair extends EventEmitter {
                                 [type, entry] = data;
                                 handleEntry();
                             } // for
+                            txns.delete(tid);
 
                         } else if ('2002' === type) { // txn abort
                             txns.delete(tid);
