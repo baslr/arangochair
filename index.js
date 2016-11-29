@@ -1,5 +1,7 @@
 'use strict';
 
+const fastango = require('fastango3');
+const assert   = require('assert');
 const EventEmitter = require('events');
 
 const https = require('request-easy').https; 
@@ -34,6 +36,8 @@ class ArangoChair extends EventEmitter {
 
         this.collectionsMap = new Map();
         this._stopped = false;
+
+        this._liveQueries = new Map();
     }
 
     start() {
@@ -43,6 +47,61 @@ class ArangoChair extends EventEmitter {
 
     stop() {
         this._stopped = true;
+    }
+
+    liveQuery(aql, collections, opts, callback) {
+        if ('function' === typeof opts) {
+            callback = opts;
+            opts = {};
+        } // if
+        const fast = fastango('http://192.168.2.103:8529');
+        let   res = [];
+        const update = () => {
+            fast._q(aql, {},{all:true,profile:true}, (status, results, extras) => {
+                console.log(extras.stats.executionTime * 1000);
+                if (! opts.diff) {
+                    try {
+                        if (res.length !== results.length) throw 'unequal';
+                        for(const idx in results) {
+                            assert.deepStrictEqual(results[idx], res[idx]);
+                        } // for
+                    } catch(e) {
+                        res = results;
+                        callback(res);
+                    } // catch()
+                } else { // if
+
+                    const diff = [];
+
+                    for(const result of results) {
+                        let eq = false;
+                        for(const r of res) {
+                            try {
+                                assert.notDeepStrictEqual(result, r);
+                            } catch(e) {
+                                eq = true;
+                                break;
+                            }
+                        } // for
+                        if (!eq) {
+                            diff.push(result);
+                        }
+                    } // for
+
+                    if (diff.length) {
+                        res = results;
+                        callback(diff);
+                    } // if
+                } // else
+            });
+        };
+        if (opts.initialResultSet) update();
+        this._liveQueries.set(aql, {collections:collections, callback:update});
+
+/*        for(const collection of collections) {
+            this.subscribe(collection);
+            this.on(collection, update);
+        } // for */
     }
 
     _startLoggerState() {
@@ -73,12 +132,26 @@ class ArangoChair extends EventEmitter {
             const commaDoubleTickBuffer = Buffer.from(',"');
 
             const txns = new Map();
+            const cols = new Set();
 
             const handleEntry = () => {
                 idx0 = entry.indexOf(cnameStartBuffer, idx0 + 2) + 8;
                 idx1 = entry.indexOf(commaDoubleTickBuffer, idx0) - 1;
 
                 const colName = entry.slice(idx0, idx1).toString();
+                if ('0' !== tid) {
+                    cols.add(colName);
+                } else {
+                    for(const [key, m] of this._liveQueries) {
+                        // console.log(m);
+                        if (m.done) continue;
+                        if (~m.collections.indexOf(colName)) {
+                            m.callback();
+                            m.done = true;
+                        } // if
+                        m.done = false;
+                    } // for
+                } // else
 
                 const colConf = this.collectionsMap.get(colName);
                 if (undefined === colConf) return;
@@ -120,6 +193,9 @@ class ArangoChair extends EventEmitter {
                         entry = body.slice(start, idx);
                         start = idx+1;
 
+
+                        console.log(entry.toString() );
+
                         // transaction   {"tick":"514132959101","type":2200,"tid":"514132959099","database":"1"}
                         // insert/update {"tick":"514092205556","type":2300,"tid":"0","database":"1","cid":"513417247371","cname":"test","data":{"_id":"test/testkey","_key":"testkey","_rev":"514092205554",...}}
                         // delete        {"tick":"514092206277","type":2302,"tid":"0","database":"1","cid":"513417247371","cname":"test","data":{"_key":"abcdef","_rev":"514092206275"}}
@@ -133,6 +209,7 @@ class ArangoChair extends EventEmitter {
 
                         if ('2200' === type) { // txn start
                             txns.set(tid, new Set());
+                            for(const m of this._liveQueries) m.done = false;
 
                         } else if ('2201' === type) { // txn commit and replay docs
                             for(const data of txns.get(tid)) {
@@ -142,8 +219,23 @@ class ArangoChair extends EventEmitter {
                             } // for
                             txns.delete(tid);
 
+                            for(const [key, m] of this._liveQueries) {
+                                // console.log(m);
+
+                                for(const col of cols) {
+                                    if (m.done) continue;
+                                    if (~m.collections.indexOf(col)) {
+                                        m.callback();
+                                        m.done = true;
+                                    }
+                                } // for
+                                m.done = false;
+                            } // for
+                            cols.clear();
+
                         } else if ('2002' === type) { // txn abort
                             txns.delete(tid);
+                            cols.clear();
 
                         } else {
                             if ('2300' !== type && '2302' !== type) continue;

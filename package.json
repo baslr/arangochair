@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "fastango3": "^3.0.0",
     "request-easy": "^2.0.1"
   },
   "name": "arangochair",
