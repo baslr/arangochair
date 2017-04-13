@@ -24,7 +24,8 @@ class ArangoChair extends EventEmitter {
         adbUrl = url.parse(adbUrl);
         this.req = new (adbUrl.protocol === 'https:'? https : http)({
             hostname:adbUrl.hostname,
-            port:adbUrl.port
+            port:adbUrl.port,
+            auth:adbUrl.auth
         });
 
         const db = '/' === adbUrl.pathname ? '/_system' : adbUrl.pathname;
