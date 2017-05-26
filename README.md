@@ -17,6 +17,16 @@ const no4 = new arangochair('http://127.0.0.1:8529/'); // ArangoDB node to monit
 
 const no4 = new arangochair('http://127.0.0.1:8529/myDb'); // ArangoDB node to monitor, with database name
 
+const no4 = new arangochair('http://user:password@127.0.0.1:8529/myDb'); // ArangoDB node to monitor, with database name, with auth
+
+const no4 = new arangochair({
+  protocol: 'http',
+  auth: 'user:password',
+  hostname: 'localhost',
+  port: 8529,
+  path: '/myDb'
+}); // ArangoDB node to monitor, with database name, with auth (`url.parse` and `url.format` properties)
+
 no4.subscribe({collection:'users'});
 no4.start();
 no4.on('users', (doc, type) => {

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "lodash.isstring": "^4.0.1",
     "request-easy": "^2.0.1"
   },
   "name": "arangochair",
