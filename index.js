@@ -5,7 +5,7 @@ const EventEmitter = require('events');
 const https = require('request-easy').https; 
 const http  = require('request-easy').http;
 const url  = require('url');
-
+const isString = require('lodash.isstring');
 
 const mapTextToType = {
     'insert/update':'2300',
@@ -16,16 +16,18 @@ const mapTypeToText = {
     '2302': 'delete'
 };
 
-
-
 class ArangoChair extends EventEmitter {
-    constructor(adbUrl) {
+    constructor(opts) {
         super();
+        let adbUrl
+        if(isString(opts)){
+          adbUrl = opts;
+        } else {
+          adbUrl = url.format(opts);
+        }
+        
         adbUrl = url.parse(adbUrl);
-        this.req = new (adbUrl.protocol === 'https:'? https : http)({
-            hostname:adbUrl.hostname,
-            port:adbUrl.port
-        });
+        this.req = new (adbUrl.protocol === 'https:'? https : http)(adbUrl);
 
         const db = '/' === adbUrl.pathname ? '/_system' : adbUrl.pathname;
 
