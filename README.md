@@ -23,7 +23,7 @@ no4.on('users', (doc, type) => {
     // do something awesome
 
     // doc:Buffer
-    // type:'insert/update'|'delete'
+    // type:'insert'|'update'|'delete'
 });
 
 no4.on('error', (err, httpStatus, headers, body) => {
@@ -40,7 +40,7 @@ no4.on('error', (err, httpStatus, headers, body) => {
 no4.subscribe('users');
 
 // explicit
-no4.subscribe({collection:'users', events:['insert/update', 'delete']});
+no4.subscribe({collection:'users', events:['insert', 'update', 'delete']});
 
 
 // subscribe the users collection with only the delete event
