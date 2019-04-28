@@ -59,9 +59,9 @@ class ArangoChair extends EventEmitter {
 
             const handleEntry = () => {
 
-                const colName = entry.cname;
+                const collectionName = entry.cname;
 
-                const colConf = this.collectionsMap.get(colName);
+                const colConf = this.collectionsMap.get(collectionName);
                 if (undefined === colConf) return;
 
                 const events = colConf.get('events');
@@ -76,7 +76,7 @@ class ArangoChair extends EventEmitter {
 
                 const doc = entry.data;
 
-                this.emit(colName, doc, typeText);
+                this.emit(collectionName, doc, event);
             };
 
             const ticktock = () => {
